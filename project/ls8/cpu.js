@@ -68,7 +68,7 @@ class CPU {
         // from the memory address pointed to by the PC. (I.e. the PC holds the
         // index into memory of the instruction that's about to be executed
         // right now.)
-
+        let IR = this.pc;
         // !!! IMPLEMENT ME
 
         // Debugging output
@@ -78,9 +78,14 @@ class CPU {
         // needs them.
 
         // !!! IMPLEMENT ME
+        let operandA = this.ram.read(IR+1);
+        let operandB = this.ram.read(IR+2);
 
         // Execute the instruction. Perform the actions for the instruction as
         // outlined in the LS-8 spec.
+        const add = (operandA, operandB) => {
+            return operandA += operandB;
+        }
 
         // !!! IMPLEMENT ME
 

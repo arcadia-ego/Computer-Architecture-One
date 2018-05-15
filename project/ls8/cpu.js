@@ -5,6 +5,11 @@
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
+const NOP = 0b00000000;
+const LDI = 0b10011001;
+const PRN = 0b01000011;
+const MUL = 0b10101010;
+const HLT = 0b00000001;
 class CPU {
 
     /**
@@ -68,23 +73,58 @@ class CPU {
         // from the memory address pointed to by the PC. (I.e. the PC holds the
         // index into memory of the instruction that's about to be executed
         // right now.)
-        let IR = this.pc;
+        let IR = this.ram.read(this.PC);
         // !!! IMPLEMENT ME
 
         // Debugging output
-        //console.log(`${this.PC}: ${IR.toString(2)}`);
+        // console.log(`${this.PC}: ${IR.toString(2)}`);
 
         // Get the two bytes in memory _after_ the PC in case the instruction
         // needs them.
 
         // !!! IMPLEMENT ME
-        let operandA = this.ram.read(IR+1);
-        let operandB = this.ram.read(IR+2);
+        let operandA = this.ram.read(this.PC+1);
+        let operandB = this.ram.read(this.PC+2);
 
         // Execute the instruction. Perform the actions for the instruction as
         // outlined in the LS-8 spec.
-        const add = (operandA, operandB) => {
-            return operandA += operandB;
+        // const ADD = (operandA, operandB) => {
+        //     return operandA += operandB;
+        // }
+
+        // const AND = (operandA, operandB) => {
+        //     if (operandA === operandB) {
+        //         return operandA = true;
+        //     } else {
+        //         return operandA = false;
+        //     }
+        // } 
+
+        switch(IR) {
+            case LDI:
+                this.reg[operandA] = operandB;
+                // this.PC += 3;
+                break;
+
+            case PRN:
+                console.log(this.reg[operandA]);
+                // this.PC += 2;
+                break;
+
+            case HLT:
+                this.stopClock();
+                break;
+            
+            case MUL:
+                 this.reg[0] *= this.reg[1];
+                break;
+
+            case NOP:
+                break;
+
+            default:
+            console.log(`Unknown Instruction At ${this.PC}: ${IR.toString(2)}`);
+            this.stopClock();
         }
 
         // !!! IMPLEMENT ME
@@ -95,6 +135,7 @@ class CPU {
         // for any particular instruction.
         
         // !!! IMPLEMENT ME
+        this.PC += (IR >> 6) + 1;
     }
 }
 

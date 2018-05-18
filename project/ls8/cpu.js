@@ -5,11 +5,20 @@
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
+
+
 const NOP = 0b00000000;
 const LDI = 0b10011001;
 const PRN = 0b01000011;
 const MUL = 0b10101010;
 const HLT = 0b00000001;
+const JMP = 0b01010000;
+const CALL = 0b01001000;
+const RET = 0b00001001;
+const PUSH = 0b01001101;
+const POP = 0b01001100;
+
+const SP = 7; //jeez 
 class CPU {
 
     /**
@@ -19,7 +28,8 @@ class CPU {
         this.ram = ram;
 
         this.reg = new Array(8).fill(0); // General-purpose registers R0-R7
-        
+        this.reg[SP] = 0xf4; //didnt know you could just reference it like this lol
+
         // Special-purpose registers
         this.PC = 0; // Program Counter
     }
@@ -28,6 +38,7 @@ class CPU {
      * Store value in memory address, useful for program loading
      */
     poke(address, value) {
+
         this.ram.write(address, value);
     }
 
@@ -99,7 +110,7 @@ class CPU {
         //         return operandA = false;
         //     }
         // } 
-
+        // console.log(`inititalSP: ${SP}`)
         switch(IR) {
             case LDI:
                 this.reg[operandA] = operandB;
@@ -116,8 +127,17 @@ class CPU {
                 break;
             
             case MUL:
-                 this.reg[0] *= this.reg[1];
+                 this.reg[operandA] *= this.reg[operandB];
                 break;
+
+            case PUSH:
+                this.reg[SP]--;
+                this.ram.write(this.reg[SP], this.reg[operandA])
+                // console.log(this.reg[operandA])
+            case POP:
+                this.reg[operandA] = this.ram.read(this.reg[SP]);
+                this.reg[SP]++;
+                // console.log(this.reg[operandA])
 
             case NOP:
                 break;
@@ -135,8 +155,11 @@ class CPU {
         // for any particular instruction.
         
         // !!! IMPLEMENT ME
-        this.PC += (IR >> 6) + 1;
+        if(IR !== CALL && IR !== JMP && IR !== RET) {
+            this.PC += (IR >> 6) + 1;
+        }
     }
 }
+
 
 module.exports = CPU;
